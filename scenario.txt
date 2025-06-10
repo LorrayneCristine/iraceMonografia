@@ -13,7 +13,8 @@ execDir = "./"
 
 ## Directory where tuning instances are located, either absolute path or
 ## relative to current directory.
-trainInstancesDir = "./instances"
+trainInstancesDir = trainInstances = anjos-70-03.txt anjos-80-05.txt o-15_t.txt o-5_t_2.txt s-20_t.txt s-25_t.txt sko-49.txt y-35_t.txt y-60_t.txt
+
 
 ## The maximum number of runs (invocations of targetRunner) that will performed. It
 ## determines the (maximum) budget of experiments for the tuning.
