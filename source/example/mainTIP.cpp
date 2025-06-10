@@ -95,23 +95,8 @@ int main(int argc, char* argv[]) {
     ExecTime timer;
     solTIP best = algo.start(threadCount, problem);
 
-    // 6) exibe resultados
-    std::cout << "Tempo total: ";
-    timer.printTime();
-    std::cout << "Melhor custo: " << best.evalSol *2 << "\n";
-
-    int MagSize = problem->getMagazineSize();
-    int NT      = problem->getUniqueTools().size();
-    std::cout << "Número de ferramentas: " << NT
-              << " | Tamanho do magazine (slots): " << MagSize << "\n";
-
-    auto mag = problem->decodeSolution(best);
-    std::cout << "Layout no tambor (" << MagSize << " slots):\n";
-    for (int i = 0; i < MagSize; ++i) {
-        if (mag[i] < 0)  std::cout << "x ";
-        else             std::cout << mag[i] << " ";
-    }
-    std::cout << "\n";
+    // 6) exibe resultadoss
+    std::cout << best.evalSol *2;
 
     delete problem;
     return 0;
