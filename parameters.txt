@@ -1,10 +1,6 @@
-TEMP_INIT      --TEMP_INIT     r   (0.01, 0.02, 0.03)
-TEMP_FIM       --TEMP_FIM      r   (10.0, 20.0, 30.0)
-N_REPLICAS     --N_REPLICAS    i   [1, ${cores} - 1]
-MCL            --MCL           i   (500,10000)
-TEMP_DIST      --TEMP_DIST     i   (1,2,3,4)
-TYPE_UPDATE    --TYPE_UPDATE   c   (1,2,3)
-TEMP_UPDATE    --TEMP_UPDATE   i   (3,4,5)
-THREAD_USED    --THREAD_USED   i   [1, ${cores} - 1]
-
-
+TEMP_INIT      "--TEMP_INIT"     c   (0.01, 0.02, 0.03)
+TEMP_FIM       "--TEMP_FIM"      c   (1.0, 2.0, 3.0)
+MCL            "--MCL"           c   (300,400,500,600)
+TEMP_DIST      "--TEMP_DIST"     c   (1,2,3,4)
+TYPE_UPDATE    "--TYPE_UPDATE"   c   (1,2,3)
+TEMP_UPDATE    "--TEMP_UPDATE"   c   (3,4,5)

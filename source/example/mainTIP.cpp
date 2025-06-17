@@ -25,13 +25,13 @@ int main(int argc, char* argv[]) {
     // valores-padrão
     double tempIni       = 0.02;
     double tempFim       = 20.0;
-    int    numReplicas   = static_cast<int>(cores);
+    int    numReplicas   = 7;
     int    MCL           = 500;
-    int    PTL           = 100;
+    int    PTL           = 2000;
     int    tempDist      = 2;
     int    typeUpdate    = 2;
     int    tempUpdateAux = 3;               // divisor de MCL para calcular tempUpdate
-    int    threadCount   = static_cast<int>(cores);
+    int    threadCount   = 7;
     int    mode          = 2;               // 1 = sequência, 2 = frequência (padrão)
 
     // nome do arquivo
