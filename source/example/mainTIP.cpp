@@ -25,13 +25,13 @@ int main(int argc, char* argv[]) {
     // valores-padrão
     double tempIni       = 0.02;
     double tempFim       = 20.0;
-    int    numReplicas   = 7;
+    int    numReplicas   = static_cast<int>(cores) - 1;
     int    MCL           = 500;
     int    PTL           = 2000;
     int    tempDist      = 2;
     int    typeUpdate    = 2;
     int    tempUpdateAux = 3;               // divisor de MCL para calcular tempUpdate
-    int    threadCount   = 7;
+    int    threadCount   = static_cast<int>(cores)- 1;
     int    mode          = 2;               // 1 = sequência, 2 = frequência (padrão)
 
     // nome do arquivo
@@ -94,9 +94,29 @@ int main(int argc, char* argv[]) {
     // 5) executa e mede tempo
     ExecTime timer;
     solTIP best = algo.start(threadCount, problem);
+    double time = timer.getTimeMs(); // em segundos
 
-    // 6) exibe resultadoss
-    std::cout << best.evalSol *2;
+    // 6) exibe resultados
+    std::cout << "Custo: " << best.evalSol *2 << "\n";
+
+    std::cout << "Tempo: " << (time/60000.0) << " minutos\n";
+
+   int MagSize = problem->getMagazineSize();
+    int NT      = problem->getUniqueTools().size();
+
+    auto mag = problem->decodeSolution(best);
+    std::cout << "Magazine: ";
+    for (int i = 0; i < MagSize; ++i) {
+        if (mag[i] < 0)  std::cout << "x ";
+        else             std::cout << mag[i] << " ";
+    }
+    std::cout << "\n";
+    std::cout << "Ferramentas: " << NT << "\n";
+
+
+    std::cout << "Slots: " << MagSize << "\n";
+
+
 
     delete problem;
     return 0;
