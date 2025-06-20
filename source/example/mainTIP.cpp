@@ -11,9 +11,10 @@
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Uso: " << argv[0]
-                  << " <instancia.txt> [--MODE 1|2] [--TEMP_INIT t0] [--TEMP_FIM tF] "
+                  << " <instancia.txt> [--MODE 1|2] [--MOV_TYPE 1|2|3] "
+                     "[--TEMP_INIT t0] [--TEMP_FIM tF] "
                      "[--N_REPLICAS R] [--MCL mcl] [--PTL ptl] "
-                     "[--TEMP_DIST d] [--TYPE_UPDATE u] [--TEMP_UPDATE div] "
+                     "[--TEMP_DIST d] [--TYPE_UPDATE u] [--TEMP_UPDATE tu] "
                      "[--THREAD_USED T]\n";
         return 1;
     }
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
     int    tempUpdateAux = 3;               // divisor de MCL para calcular tempUpdate
     int    threadCount   = static_cast<int>(cores)- 1;
     int    mode          = 2;               // 1 = sequência, 2 = frequência (padrão)
-
+    int    movType     = 1;  // 1=swap,2=insertion,3=2opt
     // nome do arquivo
     std::string filename = argv[1];
 
@@ -42,6 +43,9 @@ int main(int argc, char* argv[]) {
         std::string arg = argv[i];
         if (arg == "--MODE") {
             mode = std::stoi(argv[++i]);
+        }
+        else if (arg == "--MOV_TYPE") {
+            movType = std::stoi(argv[++i]);
         }
         else if (arg == "--TEMP_INIT") {
             tempIni = std::stod(argv[++i]);
@@ -77,7 +81,7 @@ int main(int argc, char* argv[]) {
     int tempUpdate = (tempUpdateAux > 0 ? MCL / tempUpdateAux : MCL);
 
     // 3) cria o problema, informando se é modo frequência (mode==2)
-    TIP* problem = new TIP(filename, mode == 2);
+    TIP* problem = new TIP(filename, mode == 2, movType);
 
     // 4) configura o Parallel Tempering
     PT<solTIP> algo(

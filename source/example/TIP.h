@@ -29,7 +29,7 @@ private:
     int numTools;                 // número de ferramentas distintas
     int magazineSize;             // tamanho do magazine (slots)
 
-    bool useFreq;                 // if true, ler matriz de frequência em vez de sequência
+    bool useFreq;                 // se true, lê matriz de frequência em vez de sequência
     std::vector<std::vector<int>> frequencyMatrix;
 
     std::vector<int> toolSequence;                // sequência de operações (modo 1)
@@ -37,6 +37,8 @@ private:
     std::unordered_map<int, int> toolToIndex;     // mapeamento ferramenta → índice interno
 
     std::vector<std::vector<int>> distanceMatrix; // matriz de distâncias circulares (modo 1)
+
+    int movType;                 // 1=swap, 2=insertion, 3=two-opt
 
     std::atomic<int> endCounter{0};  // contador para theEnd()
     int maxEnd = 0;                  // limite de chamadas a theEnd()
@@ -47,17 +49,24 @@ private:
     // gerador de números aleatórios, um por thread
     static thread_local std::mt19937 rndEngine;
 
+    // implementações de vizinhança
+    solTIP swapNeighbor(solTIP sol);
+    solTIP insertionNeighbor(solTIP sol);
+    solTIP twoOptNeighbor(solTIP sol);
+
 public:
-    // Construtor: se useFreqMode==true, lê instância de matriz de frequência;
-    // caso contrário, lê instância de sequência de operações
-    TIP(const std::string &filename, bool useFreqMode = false);
+    // Construtor:
+    //   useFreqMode = true → modo frequência
+    //   movType     = 1 (swap), 2 (insertion), 3 (two-opt)
+    TIP(const std::string &filename,
+        bool useFreqMode = false,
+        int movType      = 1);
     ~TIP();
 
-    // Implementações da interface Problem<solTIP>
+    // Interface Problem<solTIP>
     solTIP construction() override;
     solTIP neighbor(solTIP sol) override;
     double evaluate(solTIP sol) override;
-
 
     // Decodifica solução em layout de magazine (tamanho magazineSize)
     std::vector<int> decodeSolution(const solTIP &sol) const;
@@ -68,7 +77,7 @@ public:
     void buildDistanceMatrix();
     solTIP getBestSol();
 
-    // Prints
+    // Impressão
     void printCircularDistanceMatrix(const solTIP &sol) const;
     void printDistanceMatrix() const;
 };
