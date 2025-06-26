@@ -103,22 +103,21 @@ int main(int argc, char* argv[]) {
     // 6) exibe resultados
     std::cout << best.evalSol *2;
 
-    //std::cout << "Tempo: " << (time/60000.0) << " minutos\n";
+    std::cout << "Tempo: " << (time) << " minutos\n";
 
    int MagSize = problem->getMagazineSize();
     int NT      = problem->getUniqueTools().size();
 
     auto mag = problem->decodeSolution(best);
-    //std::cout << "Magazine: ";
-    //for (int i = 0; i < MagSize; ++i) {
-    //    if (mag[i] < 0)  std::cout << "x ";
-    //    else             std::cout << mag[i] << " ";
-    //}
-    //std::cout << "\n";
-    //std::cout << "Ferramentas: " << NT << "\n";
+    std::cout << "Magazine: ";
+    for (int i = 0; i < MagSize; ++i) {
+        if (mag[i] < 0)  std::cout << "x ";
+        else             std::cout << mag[i] << " ";
+    }
+    std::cout << "\n";
+    std::cout << "Ferramentas: " << NT << "\n";
 
-
-    //std::cout << "Slots: " << MagSize << "\n";
+    std::cout << "Slots: " << MagSize << "\n";
 
 
 
