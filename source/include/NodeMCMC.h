@@ -97,6 +97,9 @@ void NodeMCMC<S>::run(){
 		// Calc evaluate function 
 		neigh.evalSol = prob->evaluate(neigh); 
 		
+		// ⬅️ Adicione esta linha logo aqui
+		neigh.ptl = execAtual;
+
 		// Save best sol			
 		setBestSol(neigh);
 				

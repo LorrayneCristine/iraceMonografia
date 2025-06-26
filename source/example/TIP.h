@@ -17,6 +17,7 @@
 struct solTIP : public solution {
     std::vector<int> permutation;  // permutação das ferramentas (índices internos)
     double evalSol = std::numeric_limits<double>::infinity();
+    int ptl = -1;  // ciclo PTL onde foi encontrada
     int Nup = 0, Ndown = 0;        // contadores auxiliares, se necessário
 };
 

@@ -25,6 +25,7 @@ class Consumer{
 		mutex mtxSol;
 		atomic_int end{0};
 		int maxEnd{0};
+		int bestPTL = -1;
 		S bestSol;
 	public:		
 		Consumer(unsigned nTh);
@@ -40,6 +41,9 @@ class Consumer{
 		atomic<int>* getIndexPT();
 		atomic<int>* getMaxDif();
 		int getStopC();
+		int getBestPTL() {
+    		return bestPTL;}
+
 };
 
 
@@ -102,6 +106,7 @@ bool Consumer<S>::theEnd(S sol_){
 		unique_lock<mutex> lock{mtxSol};
 		end++;
 		if (sol_.evalSol<bestSol.evalSol) bestSol=sol_;
+		    bestPTL = sol_.ptl;  // ✅ salva o ciclo
 	}
 return (maxEnd <= end);	
 }

@@ -101,9 +101,9 @@ int main(int argc, char* argv[]) {
     double time = timer.getTimeMs(); // em segundos
 
     // 6) exibe resultados
-    std::cout << best.evalSol *2;
+    std::cout << "Custo: " <<best.evalSol *2 << "\n";
 
-    std::cout << "Tempo: " << (time) << " minutos\n";
+    std::cout << "Tempo: " << (time) << "\n";
 
    int MagSize = problem->getMagazineSize();
     int NT      = problem->getUniqueTools().size();
@@ -119,6 +119,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Slots: " << MagSize << "\n";
 
+    std::cout << "Ciclo: " << best.ptl << std::endl;
 
 
     delete problem;
