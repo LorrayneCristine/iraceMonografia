@@ -5,7 +5,7 @@ BIN="./binTIP"
 OUTFILE="resultados.csv"
 
 # Parâmetros da elite
-PARAMS="--TEMP_INIT 0.02 --TEMP_FIM 10.0 --MCL 300 --TEMP_DIST 2 --TYPE_UPDATE 3 --TEMP_UPDATE 5 --MOV_TYPE 3"
+PARAMS="--TEMP_INIT 0.01 --TEMP_FIM 20.0 --MCL 400 --TEMP_DIST 2 --TYPE_UPDATE 2 --TEMP_UPDATE 4 --MOV_TYPE 4"
 
 # Cabeçalho, só adiciona se o arquivo não existe
 if [ ! -f "$OUTFILE" ]; then

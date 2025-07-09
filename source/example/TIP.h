@@ -54,6 +54,8 @@ private:
     solTIP swapNeighbor(solTIP sol);
     solTIP insertionNeighbor(solTIP sol);
     solTIP twoOptNeighbor(solTIP sol);
+    solTIP randomNeighbor(solTIP sol);
+
 
 public:
     // Construtor:

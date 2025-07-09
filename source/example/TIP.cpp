@@ -89,9 +89,11 @@ solTIP TIP::neighbor(solTIP sol) {
         case 1: return swapNeighbor(sol);
         case 2: return insertionNeighbor(sol);
         case 3: return twoOptNeighbor(sol);
+        case 4: return randomNeighbor(sol);  // NOVO CASO
         default: return swapNeighbor(sol);
     }
 }
+
 
 // TIP.cpp
 
@@ -146,6 +148,25 @@ solTIP TIP::twoOptNeighbor(solTIP sol) {
     sol.evalSol = evaluate(sol);
     return sol;
 }
+
+
+// ---- operação 4: random (swap, insertion ou 2-opt aleatório) ----
+solTIP TIP::randomNeighbor(solTIP sol) {
+    std::uniform_int_distribution<int> dist(1, 3);  // 1=swap, 2=insertion, 3=2-opt
+    int choice = dist(rndEngine);
+    
+    switch (choice) {
+        case 1:
+            return swapNeighbor(sol);
+        case 2:
+            return insertionNeighbor(sol);
+        case 3:
+            return twoOptNeighbor(sol);
+        default:
+            return sol;  // fallback (não deve acontecer)
+    }
+}
+
 
 
 double TIP::evaluate(solTIP sol) {
