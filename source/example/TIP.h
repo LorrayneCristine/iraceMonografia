@@ -29,6 +29,7 @@ private:
     int numOps;                   // número de operações (modo sequência)
     int numTools;                 // número de ferramentas distintas
     int magazineSize;             // tamanho do magazine (slots)
+    int mode; // 1 = sequencia, 2 = matriz + gulosa, 3 = matriz + aleatória
 
     bool useFreq;                 // se true, lê matriz de frequência em vez de sequência
     std::vector<std::vector<int>> frequencyMatrix;
@@ -62,8 +63,9 @@ public:
     //   useFreqMode = true → modo frequência
     //   movType     = 1 (swap), 2 (insertion), 3 (two-opt)
     TIP(const std::string &filename,
-        bool useFreqMode = false,
-        int movType      = 1);
+    int mode         = 1,
+    int movType      = 1);
+
     ~TIP();
 
     // Interface Problem<solTIP>
@@ -79,10 +81,9 @@ public:
     // Auxiliares de execução
     void buildDistanceMatrix();
     solTIP getBestSol();
+    solTIP greedyConstructionFreq();
 
     // Impressão
-    void printCircularDistanceMatrix(const solTIP &sol) const;
-    void printDistanceMatrix() const;
 };
 
 #endif // TIP_H

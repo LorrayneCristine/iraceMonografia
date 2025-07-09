@@ -14,8 +14,8 @@
 // Gerador de números aleatórios, um por thread
 thread_local std::mt19937 TIP::rndEngine{std::random_device{}()};
 
-TIP::TIP(const std::string &filename, bool useFreqMode, int movType_)
-  : useFreq(useFreqMode), movType(movType_)
+TIP::TIP(const std::string &filename, int mode_, int movType_)
+    : mode(mode_), movType(movType_)
 {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -23,7 +23,7 @@ TIP::TIP(const std::string &filename, bool useFreqMode, int movType_)
         std::exit(1);
     }
 
-    if (!useFreq) {
+    if (mode == 1) {
         //
         // MODO 1: sequência de operações
         //
@@ -46,7 +46,7 @@ TIP::TIP(const std::string &filename, bool useFreqMode, int movType_)
             toolToIndex[uniqueTools[i]] = i;
         numTools = uniqueTools.size();
     }
-    else {
+    else if(mode == 2 || mode == 3){
         //
         // MODO 2: matriz de frequência
         //
@@ -78,21 +78,76 @@ solTIP TIP::construction() {
     sol.permutation.resize(numTools);
     for (int i = 0; i < numTools; ++i)
         sol.permutation[i] = i;
-    std::shuffle(sol.permutation.begin(), sol.permutation.end(), rndEngine);
+
+    if (mode == 1 || mode == 3) {
+        std::shuffle(sol.permutation.begin(), sol.permutation.end(), rndEngine);
+    } else if (mode == 2) {
+        sol = greedyConstructionFreq();  // novo método
+    }
+
     sol.evalSol = evaluate(sol);
     return sol;
 }
 
+
+
+solTIP TIP::greedyConstructionFreq() {
+    solTIP sol;
+    sol.permutation.clear();
+    std::vector<bool> used(numTools, false);
+
+    using Pair = std::pair<int, int>;
+    std::vector<std::tuple<int, Pair>> freqPairs;
+
+    for (int i = 0; i < numTools; ++i) {
+        for (int j = i + 1; j < numTools; ++j) {
+            int freq = frequencyMatrix[i][j];
+            if (freq > 0)
+                freqPairs.emplace_back(freq, std::make_pair(i, j));
+        }
+    }
+
+    std::sort(freqPairs.rbegin(), freqPairs.rend()); // maior frequência primeiro
+
+    for (const auto& [freq, pair] : freqPairs) {
+        int i = pair.first;
+        int j = pair.second;
+
+        if (!used[i]) {
+            sol.permutation.push_back(i);
+            used[i] = true;
+        }
+        if (!used[j]) {
+            sol.permutation.push_back(j);
+            used[j] = true;
+        }
+
+        if ((int)sol.permutation.size() == numTools)
+            break;
+    }
+
+    // Adiciona qualquer ferramenta que não apareceu ainda
+    for (int i = 0; i < numTools; ++i) {
+        if (!used[i]) {
+            sol.permutation.push_back(i);
+        }
+    }
+
+    return sol;
+}
+
+
+
 solTIP TIP::neighbor(solTIP sol) {
-    // despacha para o tipo de movimento escolhido
     switch (movType) {
         case 1: return swapNeighbor(sol);
         case 2: return insertionNeighbor(sol);
         case 3: return twoOptNeighbor(sol);
-        case 4: return randomNeighbor(sol);  // NOVO CASO
+        case 4: return randomNeighbor(sol);
         default: return swapNeighbor(sol);
     }
 }
+
 
 
 // TIP.cpp
@@ -170,7 +225,7 @@ solTIP TIP::randomNeighbor(solTIP sol) {
 
 
 double TIP::evaluate(solTIP sol) {
-    if (!useFreq) {
+    if (mode == 1) {
         //
         // MODO 1: sequência de operações
         //
