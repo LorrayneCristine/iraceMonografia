@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     double tempFim       = 20.0;
     int    numReplicas   = static_cast<int>(cores) - 1;
     int    MCL           = 500;
-    int    PTL           = 2000;
+    int    PTL           = 2200;
     int    tempDist      = 2;
     int    typeUpdate    = 2;
     int    tempUpdateAux = 3;               // divisor de MCL para calcular tempUpdate
