@@ -94,6 +94,9 @@ int main(int argc, char* argv[]) {
         typeUpdate,
         tempUpdate
     );
+// Define quais réplicas devem usar a construção heurística (ex: réplica 0 e do meio)
+std::unordered_set<int> replicasHeuristicas = {0, numReplicas / 2};
+problem->setHeuristicReplicas(replicasHeuristicas);
 
     // 5) executa e mede tempo
     ExecTime timer;

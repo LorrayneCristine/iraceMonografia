@@ -39,6 +39,7 @@ private:
     std::unordered_map<int, int> toolToIndex;     // mapeamento ferramenta → índice interno
 
     std::vector<std::vector<int>> distanceMatrix; // matriz de distâncias circulares (modo 1)
+    std::unordered_set<int> heuristicReplicas;  // ⬅ privado
 
     int movType;                 // 1=swap, 2=insertion, 3=two-opt
 
@@ -69,7 +70,10 @@ public:
     ~TIP();
 
     // Interface Problem<solTIP>
-    solTIP construction() override;
+// Interface Problem<solTIP>
+    solTIP construction() override;            // versão padrão (sem ID)
+    solTIP construction(int replicaID);        // versão com ID (nova)
+    void setHeuristicReplicas(const std::unordered_set<int>& replicas);  // ⬅ público
     solTIP neighbor(solTIP sol) override;
     double evaluate(solTIP sol) override;
 

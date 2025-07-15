@@ -42,7 +42,7 @@ class NodeMCMC: public Node{
 
 	public:
 		
-		NodeMCMC(int MCL_,atomic<int>* PTL_, double temp_, Problem<S>* prob_,Consumer<S>* pool_);
+		NodeMCMC(int MCL_, atomic<int>* PTL_, double temp_, Problem<S>* prob_, Consumer<S>* pool_, int replicaID);
 		~NodeMCMC();
 		void run();
 		bool ready();
@@ -68,7 +68,7 @@ class NodeMCMC: public Node{
 
 //Inicializa os atributos.		Salva o número de passos MCMC (MCL), temperatura, ponteiros de problema e thread-pool.
 template<typename S>
-NodeMCMC<S>::NodeMCMC(int MCL_, atomic<int>* PTL_, double temp_, Problem<S>* prob_,Consumer<S>* pool_)
+NodeMCMC<S>::NodeMCMC(int MCL_, atomic<int>* PTL_, double temp_, Problem<S>* prob_, Consumer<S>* pool_, int replicaID)
 :MCL(MCL_)
 ,temp(temp_)
 ,prob(prob_)
@@ -76,7 +76,7 @@ NodeMCMC<S>::NodeMCMC(int MCL_, atomic<int>* PTL_, double temp_, Problem<S>* pro
 {
 	execMax = PTL_;// ponteiro para o contador de execuções globais
 	indexPT = pool_->getIndexPT();// id compartilhado
-	sol = prob->construction();// Gera solução inicial
+	sol = prob->construction(replicaID); // ✅ agora sim, passando o ID correto da réplica
 	bestSol = sol;  // Melhor solução começa como a inicial
 				
 }

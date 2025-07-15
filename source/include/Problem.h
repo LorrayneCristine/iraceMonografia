@@ -19,6 +19,10 @@ class Problem{
 		~Problem();
 		void setBestSol(S sol);
 		virtual S construction()=0;
+		virtual S construction(int replicaID) {
+			return construction();  // fallback: usa a versão padrão se a subclasse não sobrescrever
+		}
+
 		virtual S neighbor(S sol)=0;
 		virtual double evaluate(S sol)=0;
 };

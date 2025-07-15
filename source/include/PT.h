@@ -89,6 +89,7 @@ S PT<S>::start(int thN, Problem<S>* prob){
 	Consumer<S>* consumer = new Consumer<S>(thN);
 	atomic<int> PTLEnd = PTL_;
 
+int replicaID = 0;
 
 	//variaveis
 	Node* nMCMC;
@@ -99,14 +100,14 @@ S PT<S>::start(int thN, Problem<S>* prob){
 	Node* nUpTempAux;
 		    
     // Creates the first MCMC node
-	nMCMC = new NodeMCMC<S>(MKL_,&PTLEnd,allTemps.front(), prob, consumer);
+	nMCMC = new NodeMCMC<S>(MKL_,&PTLEnd,allTemps.front(), prob, consumer, replicaID++);
 	((NodeMCMC<S>*)nMCMC)->setFirstTemp(); // check First temp 
 	consumer->setMaxEnd();
 	allTemps.pop_front();
 	nMCMCAux = nMCMC; 
 		
     // Creates the second MCMC node
-	nMCMC = new NodeMCMC<S>(MKL_,&PTLEnd,allTemps.front(), prob, consumer);
+	nMCMC = new NodeMCMC<S>(MKL_,&PTLEnd,allTemps.front(), prob, consumer, replicaID++);
 	consumer->setMaxEnd();
 	allTemps.pop_front();
 	
@@ -146,7 +147,7 @@ S PT<S>::start(int thN, Problem<S>* prob){
 	// Create the remaining nodes	
 	while(!allTemps.empty()){
 
-		nMCMC = new NodeMCMC<S>(MKL_,&PTLEnd, allTemps.front(),prob, consumer);
+		nMCMC = new NodeMCMC<S>(MKL_,&PTLEnd,allTemps.front(), prob, consumer, replicaID++);
 		consumer->setMaxEnd();
 		allTemps.pop_front();
 

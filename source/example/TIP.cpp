@@ -74,20 +74,33 @@ TIP::TIP(const std::string &filename, int mode_, int movType_)
 TIP::~TIP() {}
 
 solTIP TIP::construction() {
-    solTIP sol;
-    sol.permutation.resize(numTools);
-    for (int i = 0; i < numTools; ++i)
-        sol.permutation[i] = i;
+    // chamada padrão → pode usar versão com ID se quiser
+    return construction(-1);  // ou -1 para indicar "sem heurística"
+}
 
-    if (mode == 1 || mode == 3) {
+solTIP TIP::construction(int replicaID) {
+    solTIP sol;
+
+    bool usarHeuristica = heuristicReplicas.find(replicaID) != heuristicReplicas.end();
+
+    if (usarHeuristica) {
+        //std::cout << "[DEBUG] Réplica " << replicaID << " usando HEURÍSTICA\n";
+        sol = greedyConstructionFreq();
+    } else {
+        //std::cout << "[DEBUG] Réplica " << replicaID << " usando ALEATÓRIA\n";
+        sol.permutation.resize(numTools);
+        for (int i = 0; i < numTools; ++i)
+            sol.permutation[i] = i;
         std::shuffle(sol.permutation.begin(), sol.permutation.end(), rndEngine);
-    } else if (mode == 2) {
-        sol = greedyConstructionFreq();  // novo método
     }
 
     sol.evalSol = evaluate(sol);
     return sol;
 }
+
+
+
+
 
 
 
@@ -280,3 +293,7 @@ std::vector<int> TIP::decodeSolution(const solTIP &sol) const {
 }
 
 // (os demais auxiliares de impressão / contagem de término permanecem iguais)
+
+void TIP::setHeuristicReplicas(const std::unordered_set<int>& replicas) {
+    heuristicReplicas = replicas;
+}
