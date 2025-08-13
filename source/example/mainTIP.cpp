@@ -3,15 +3,18 @@
 #include <thread>
 #include <iostream>
 #include <string>
-#include <unistd.h>               // for sysconf()
-#include "../include/ExecTime.h"
-#include "../include/PT.h"        // traz PT<solTIP>
-#include "TIP.h"
+#include <unistd.h>               // Para sysconf(): detectar núcleos da CPU
+#include "../include/ExecTime.h" // Utilitário para medir tempo de execução
+#include "../include/PT.h"       // Traz a classe Parallel Tempering (PT<solTIP>)
+#include "TIP.h"                 // Define o problema TIP
 
 int main(int argc, char* argv[]) {
+    // ------------------------------------------------------------
+    // Verificação mínima de argumentos
+    // ------------------------------------------------------------
     if (argc < 2) {
         std::cerr << "Uso: " << argv[0]
-                  << " <instancia.txt> [--MODE 1|2|3] [--MOV_TYPE 1|2|3] "
+                  << " <instancia.txt> [--MODE 1|2|3] [--MOV_TYPE 1|2|3|4] "
                      "[--TEMP_INIT t0] [--TEMP_FIM tF] "
                      "[--N_REPLICAS R] [--MCL mcl] [--PTL ptl] "
                      "[--TEMP_DIST d] [--TYPE_UPDATE u] [--TEMP_UPDATE tu] "
@@ -19,26 +22,35 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // detecta núcleos de CPU
+    // ------------------------------------------------------------
+    // Detecta número de núcleos disponíveis
+    // ------------------------------------------------------------
     long cores = sysconf(_SC_NPROCESSORS_ONLN);
-    if (cores <= 0) cores = 1;
+    if (cores <= 0) cores = 1; // fallback para 1 thread
 
-    // valores-padrão
-    double tempIni       = 0.02;
-    double tempFim       = 20.0;
-    int    numReplicas   = static_cast<int>(cores) - 1;
-    int    MCL           = 500;
-    int    PTL           = 10000;
-    int    tempDist      = 2;
-    int    typeUpdate    = 2;
-    int    tempUpdateAux = 3;               // divisor de MCL para calcular tempUpdate
-    int    threadCount   = static_cast<int>(cores)- 1;
-    int    mode          = 3;               // 1 = sequência, 2 = frequência (padrão)
-    int    movType     = 1;  // 1=swap,2=insertion,3=2opt
-    // nome do arquivo
+    // ------------------------------------------------------------
+    // Valores-padrão dos parâmetros (com base no preset informado)
+    // ------------------------------------------------------------
+    double tempIni       = 0.01;                          // Temperatura inicial
+    double tempFim       = 20.0;                          // Temperatura final
+    int    numReplicas   = static_cast<int>(cores) - 1;   // Nº de réplicas = núcleos - 1
+    int    MCL           = 500;                           // Máx ciclos por réplica (Markov Chain Length)
+    int    PTL           = 2500;                          // Ciclos totais do Parallel Tempering
+    int    tempDist      = 2;                             // Espaçamento das temperaturas
+    int    typeUpdate    = 2;                             // Estratégia de atualização de temperatura
+    int    tempUpdateAux = 4;                             // Divisor de MCL para definir freq de troca
+    int    threadCount   = static_cast<int>(cores) - 1;   // Nº de threads = núcleos - 1
+    int    mode          = 3;                             // Modo de leitura: 3 = matriz + heurística
+    int    movType       = 4;                             // Tipo de movimento: 4 = random
+
+    // ------------------------------------------------------------
+    // Nome da instância fornecida
+    // ------------------------------------------------------------
     std::string filename = argv[1];
 
-    // parse das flags a partir de argv[2]
+    // ------------------------------------------------------------
+    // Leitura dos argumentos da linha de comando
+    // ------------------------------------------------------------
     for (int i = 2; i + 1 < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "--MODE") {
@@ -69,21 +81,26 @@ int main(int argc, char* argv[]) {
             typeUpdate = std::stoi(argv[++i]);
         }
         else if (arg == "--TEMP_UPDATE") {
-            // agora TEMP_UPDATE é o divisor de MCL
-            tempUpdateAux = std::stoi(argv[++i]);
+            tempUpdateAux = std::stoi(argv[++i]); // divisor de MCL
         }
         else if (arg == "--THREAD_USED") {
             threadCount = std::stoi(argv[++i]);
         }
     }
 
-    // calcula o tempUpdate real
+    // ------------------------------------------------------------
+    // Calcula quantas iterações entre cada tentativa de troca de temperatura
+    // ------------------------------------------------------------
     int tempUpdate = (tempUpdateAux > 0 ? MCL / tempUpdateAux : MCL);
 
-    // 3) cria o problema, informando se é modo frequência (mode==2)
+    // ------------------------------------------------------------
+    // Cria o problema com os parâmetros informados
+    // ------------------------------------------------------------
     TIP* problem = new TIP(filename, mode, movType);
 
-    // 4) configura o Parallel Tempering
+    // ------------------------------------------------------------
+    // Inicializa o algoritmo Parallel Tempering com as configurações
+    // ------------------------------------------------------------
     PT<solTIP> algo(
         tempIni,
         tempFim,
@@ -94,37 +111,57 @@ int main(int argc, char* argv[]) {
         typeUpdate,
         tempUpdate
     );
-// Define quais réplicas devem usar a construção heurística (ex: réplica 0 e do meio)
-std::unordered_set<int> replicasHeuristicas = {0, numReplicas / 2};
-problem->setHeuristicReplicas(replicasHeuristicas);
 
-    // 5) executa e mede tempo
+    // ------------------------------------------------------------
+    // Define quais réplicas vão usar construção gulosa
+    // ------------------------------------------------------------
+    std::unordered_set<int> replicasHeuristicas;
+    if (mode == 2) {
+        // Modo 2 = 100% aleatório
+        replicasHeuristicas.clear();
+    } else if (mode == 3) {
+        // Modo 3 = híbrido: primeira e do meio são heurísticas
+        replicasHeuristicas = {0, numReplicas / 2};
+    }
+
+    // Informa ao problema quais réplicas usarão heurística gulosa
+    problem->setHeuristicReplicas(replicasHeuristicas);
+
+    // ------------------------------------------------------------
+    // Executa o algoritmo e mede o tempo de execução
+    // ------------------------------------------------------------
     ExecTime timer;
     solTIP best = algo.start(threadCount, problem);
-    double time = timer.getTimeMs(); // em segundos
+    double time = timer.getTimeMs(); // Tempo total em milissegundos
 
-    // 6) exibe resultados
-    std::cout << "Custo: " <<best.evalSol *2 << "\n";
+    // ------------------------------------------------------------
+    // Impressão dos resultados
+    // ------------------------------------------------------------
+    std::cout << "Custo: " << best.evalSol * 2 << "\n"; // custo final (ajustado)
+    std::cout << "Tempo: " << time << "\n";             // tempo em ms
 
-    std::cout << "Tempo: " << (time) << "\n";
+    int MagSize = problem->getMagazineSize();           // slots do magazine
+    int NT      = problem->getUniqueTools().size();     // nº de ferramentas
 
-   int MagSize = problem->getMagazineSize();
-    int NT      = problem->getUniqueTools().size();
-
+    // Mostra o layout final do magazine
     auto mag = problem->decodeSolution(best);
     std::cout << "Magazine: ";
     for (int i = 0; i < MagSize; ++i) {
-        if (mag[i] < 0)  std::cout << "x ";
-        else             std::cout << mag[i] << " ";
+        if (mag[i] < 0) std::cout << "x ";
+        else            std::cout << mag[i] << " ";
     }
     std::cout << "\n";
-    std::cout << "Ferramentas: " << NT << "\n";
 
+    // Ferramentas e slots
+    std::cout << "Ferramentas: " << NT << "\n";
     std::cout << "Slots: " << MagSize << "\n";
 
+    // Ciclo em que a melhor solução foi encontrada
     std::cout << "Ciclo: " << best.ptl << std::endl;
 
-
+    // ------------------------------------------------------------
+    // Libera memória e finaliza
+    // ------------------------------------------------------------
     delete problem;
     return 0;
 }

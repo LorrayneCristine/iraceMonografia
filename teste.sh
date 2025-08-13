@@ -25,8 +25,9 @@ for INSTANCE in instances/*.txt; do
     TEMPO=$(echo "$OUTPUT" | grep -i "Tempo" | grep -Eo '[0-9.]+' | head -n 1)
     SLOTS=$(echo "$OUTPUT" | grep -i "slots" | grep -Eo '[0-9]+' | head -n 1)
     FERRAMENTAS=$(echo "$OUTPUT" | grep -i "ferramenta" | grep -Eo '[0-9]+' | head -n 1)
-    MAGAZINE=$(echo "$OUTPUT" | grep -i "magazine" | cut -d ':' -f2- | tr -d '[]' | tr '\n' ' ')
     CICLO=$(echo "$OUTPUT" | grep -i "Ciclo" | grep -Eo '[0-9]+')
+    MAGAZINE=$(echo "$OUTPUT" | grep -i "magazine" | cut -d ':' -f2- | tr -d '[]' | tr '\n' ' ')
+
 
     # Salva resultado
     echo "$run,$INST,$CUSTO,$TEMPO,$SLOTS,$FERRAMENTAS,$CICLO,\"$MAGAZINE\",\"$PARAMS\"" >> "$OUTFILE"

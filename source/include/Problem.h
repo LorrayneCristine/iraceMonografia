@@ -16,7 +16,7 @@ class Problem{
 		solution bestSol;
 	public:
 		Problem();
-		~Problem();
+		virtual ~Problem();
 		void setBestSol(S sol);
 		virtual S construction()=0;
 		virtual S construction(int replicaID) {

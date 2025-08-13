@@ -94,7 +94,7 @@ int replicaID = 0;
 	//variaveis
 	Node* nMCMC;
 	Node* nSwap;
-	Node* nUpTemp;	
+	Node* nUpTemp = nullptr;
 	Node* nMCMCAux;
 	Node* nSwapAux;
 	Node* nUpTempAux;
