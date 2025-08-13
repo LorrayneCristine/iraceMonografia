@@ -101,6 +101,8 @@ public:
     void buildDistanceMatrix();                  // Calcula a matriz de distância circular (modo sequência)
     solTIP getBestSol();                         // Retorna a melhor solução global
     solTIP greedyConstructionFreq();             // Construção gulosa com base na matriz de frequência
+    // TIP.h (adicione no public:)
+    solTIP localSearch(solTIP sol);
 
     // -------------------------------------------------------------------------
     // Impressão (caso deseje adicionar futuramente)

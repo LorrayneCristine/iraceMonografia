@@ -319,3 +319,27 @@ std::vector<int> TIP::decodeSolution(const solTIP &sol) const {
 void TIP::setHeuristicReplicas(const std::unordered_set<int>& replicas) {
     heuristicReplicas = replicas;
 }
+// TIP.cpp
+solTIP TIP::localSearch(solTIP sol) {
+    bool improved = true;
+    while (improved) {
+        improved = false;
+
+        for (int i = 0; i < numTools; ++i) {
+            for (int j = 0; j < numTools; ++j) {
+                if (i == j) continue;
+
+                std::swap(sol.permutation[i], sol.permutation[j]);
+                double newCost = evaluate(sol);
+                if (newCost < sol.evalSol) {
+                    sol.evalSol = newCost;
+                    improved = true;
+                    goto next_iter;
+                }
+                std::swap(sol.permutation[i], sol.permutation[j]);
+            }
+        }
+    next_iter:;
+    }
+    return sol;
+}

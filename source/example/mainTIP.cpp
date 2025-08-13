@@ -133,6 +133,7 @@ int main(int argc, char* argv[]) {
     ExecTime timer;
     solTIP best = algo.start(threadCount, problem);
     double time = timer.getTimeMs(); // Tempo total em milissegundos
+    best = problem->localSearch(best);
 
     // ------------------------------------------------------------
     // Impressão dos resultados
